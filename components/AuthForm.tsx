@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from "next/image"
 
 
-import { email, z } from "zod"
+import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
@@ -24,12 +24,15 @@ import CustomInput from './CustomInput'
 import { authFormSchema } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { getLoggedInUser, signIn, signUp } from '@/lib/actions/user.actions'
+//import SignIn from '@/app/(auth)/sign-in/page'
 
 
 const AuthForm = ({type}:{type:string}) => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isLoading, setisLoading] = useState(false);
+
 
   const formSchema = authFormSchema(type);
 
@@ -51,17 +54,14 @@ const AuthForm = ({type}:{type:string}) => {
     try{
       // Sign up with Appwrite & create plaid link token
       if(type === 'sign-up'){
-        // const newUser = await signUp(data); 
+        const newUser = await signUp(data); 
 
-        // setUser(newUser)  
+        setUser(newUser);  
       }
       if(type === 'sign-in'){
-        // const response = await SignIn({
-        //   email: data.email,
-        //   password: data.password
-        // })
+        const response = await signIn({email: data.email, password: data.password,})
 
-        // if (response) router.push('/')
+        if (response) router.push('/')
       }
 
     } catch (error){
@@ -82,6 +82,7 @@ const AuthForm = ({type}:{type:string}) => {
             />
             <h1 className='text-26 font-ibm-plex-serif font-bold text-black-1'>Ecos</h1>
           </Link>
+
           <div className='flex flex-col gap-1 md:gap-3'>
             <h1 className='text-24 lg:text-36 font-semibold text-gray-900'>
               {user
@@ -93,7 +94,7 @@ const AuthForm = ({type}:{type:string}) => {
               <p className='text-16 font-normal text-gray-600'>
                 {user
                   ? 'Link your account to get started'
-                  : 'Welcome Back! Please enter your details.'
+                  : 'Please enter your details.'
                 }
               </p>
             </h1>
